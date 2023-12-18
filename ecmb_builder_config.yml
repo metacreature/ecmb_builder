@@ -1,0 +1,13 @@
+
+working_dir: ../working_dir
+
+# automatic rename your:
+# - volume-folders (if there are 2 folder-levels) to volume_{number_zerofill}
+# - chapter-folders to chapter_{number_zerofill}
+# - images which are in your chapter-folders to img_{number_zerofill}0.{extension}
+# files are sorted by the file-system (alphanumeric)
+# after rename each name will only exist once in the entire source-folder
+# files and folders starting with "__" (2 underscores) are ignored in general
+# images outside the chapter-folders ar also ignored for rename
+# if it got stuck, coz you have opened a file/folder and block access - dont-worry - start it twice
+rename: yes

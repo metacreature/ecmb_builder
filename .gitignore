@@ -1,4 +1,5 @@
 __pycache__/
+lib/ecmblib/
 .settings/
 .project
 .buildpath

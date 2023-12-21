@@ -7,11 +7,12 @@ from lib.ecmblib.ecmb import ecmbException
 def init(ctx, folder_name):
 	print(' ', flush=True)
 	try:
-		builder = ecmbBuilder()
-		builder.initialize(folder_name)
-		print('\033[1;32;40m  SUCCESS! \x1b[0m\n', flush=True)
+		builder = ecmbBuilder(folder_name)
+		builder.initialize()
+		print('\033[1;32;40m  SUCCESS!\x1b[0m\n', flush=True)
 	except ecmbException as e:
-		print('\x1b[31;20m  ' + str(e) + ' \x1b[0m\n', flush=True)
+		msg = '\n'.join(['  ' + p for p in str(e).split('\n')])
+		print('\x1b[31;20m\n' + msg + '\n\n FAILED!  \x1b[0m\n', flush=True)
 	
 
 
@@ -19,10 +20,11 @@ def init(ctx, folder_name):
 def build(ctx, folder_name, volumes = None):
 	print(' ', flush=True)
 	try:
-		builder = ecmbBuilder()
-		builder.build(folder_name, volumes)
+		builder = ecmbBuilder(folder_name)
+		builder.build(volumes)
 		print('\033[1;32;40m  SUCCESS! \x1b[0m\n', flush=True)
 	except ecmbException as e:
-		print('\x1b[31;20m  ' + str(e) + ' \x1b[0m\n', flush=True)
+		msg = '\n'.join(['  ' + p for p in str(e).split('\n')])
+		print('\x1b[31;20m\n' + msg + '\n\n  FAILED!  \x1b[0m\n', flush=True)
 	
 

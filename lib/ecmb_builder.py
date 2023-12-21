@@ -1,118 +1,211 @@
-import re, os, yaml, io, path, json, hashlib
+import re, os, yaml, io, path, json, hashlib, importlib
+from tqdm import tqdm
 from datetime import datetime
 from .ecmb_builder_utils import ecmbBuilderUtils
+from .ecmb_builder_config import ecmbBuilderConfig
+from .ecmb_builder_book_config import ecmbBuilderBookConfig
+from .resize.ecmb_builder_resize_base import ecmbBuilderResizeBase
 from .ecmblib.ecmb import ecmbBook, ecmbUtils, ecmbException, BOOK_TYPE, BASED_ON_BOOK_TYPE, CONTENT_WARNING, AUTHOR_TYPE, ALLOWED_IMAGE_EXTENTIONS 
 
 
 class ecmbBuilder():
-
-    _working_dir = None
-    _rename = None
-
-    _source_dir = None
-    _is_initialized = None
+    
+    _builder_config = None
     _book_config = None
+    _source_dir = None
+    _output_dir = None
+    
 
     _has_volumes = None
     _volume_folders = None
     _chapter_folders = None
 
 
-    def __init__(self):
-        self._load_config()
+    def __init__(self, folder_name:str):
+        self._builder_config = ecmbBuilderConfig()
+        self._set_dirs(folder_name)
+        self._book_config = ecmbBuilderBookConfig(self._builder_config, self._source_dir)
 
 
-    def initialize(self, folder_name: str) -> None:
-        self._set_source_dir(folder_name)
-        self._read_book_config()
-        if self._is_initialized:
+    def initialize(self) -> None:
+        if self._book_config.is_initialized:
             raise ecmbException('Book is allready initialized!')
-        self._read_folder_structure()
         self._rename_source_files()
-        self._init_book_config(folder_name)
+        self._init_book_config()
 
 
-    def build(self, folder_name: str, volumes: int|list[int]) -> None:
-        pass
+    def build(self, volumes: int|list[int]) -> None:
+        if not self._book_config.is_initialized:
+            raise ecmbException('Book is not initialized!')
+        
+        resize_method = self._load_resize_method()
+        
+        if self._book_config.chapter_list:
+            self._build_book(resize_method, '', self._book_config.chapter_list)
+        else:
+            if volumes != None:
+                volumes = volumes if type(volumes) == list else [volumes]
+
+            volume_nr = 0
+            for volume_dir, chapter_list in self._book_config.volume_list.items():
+                volume_nr += 1
+                if volumes and volume_nr not in volumes:
+                    continue
+                self._build_book(resize_method, volume_dir, chapter_list, volume_nr)
 
 
-    def _init_book_config(self, folder_name: str) -> None:
-        book_type = ecmbUtils.enum_values(BOOK_TYPE)
-        warnings = ecmbUtils.enum_values(CONTENT_WARNING)
-        based_on_book_type = ecmbUtils.enum_values(BASED_ON_BOOK_TYPE)
-        authors = ecmbUtils.enum_values(AUTHOR_TYPE)
-        authors = [{'name': '', 'type': at, 'href': ''} for at in authors]
+    def _build_book(self, resize_method: ecmbBuilderResizeBase, volume_dir: str, chapter_list: list, volume_nr: int = None) -> None:
+        config = self._book_config
 
-        book_config = {
-            'type': '|'.join(book_type),
-            'language': 'en',
-            'image_width': 900,
-            'image_height': 1200,
-            'isbn': '',
-		    'publisher': {
-                'name': '',
-                'href': ''
-            },
-            'publishdate': '1900-01-31',
-            'title':  re.sub(r'[^a-zA-Z0-9]+', ' ', folder_name).strip(),
-            'description': '',
-            'authors': authors,
-		    'genres': [],
-		    'warnings': warnings,
-            'basedon': {
-                'type': '|'.join(based_on_book_type),
-                'isbn': '',
-                'publisher': {
-                    'name': '',
-                    'href': ''
-                },
-                'publishdate': '1900-01-31',
-                'title': '',
-                'authors': authors
-            }
-        }
+        file_name = re.sub(r'[^a-zA-Z0-9]+', ' ', config.book_title).strip()
+        file_name += f' Vol. {volume_nr}' if volume_nr != None else ''
+        file_name += '.ecmb'
 
-        chapter_cnt = 0
-        chapter_template = {
-            'label': '',
-            'title': '',
-            'start_with': 'my_image_name.jpg#left'
-        }
+        print('  ' + file_name, flush=True)
 
-        if self._has_volumes:
-            book_config['volumes'] = {}
-            for volume in self._volume_folders:
-                book_config['volumes'][volume['name']] = {}
-                volume_path = volume['path'] + volume['name'] + '\\'
-                for chapter in self._chapter_folders:
-                    if chapter['path'] == volume_path:
-                        chapter_cnt += 1
-                        chapter_template.update({'label': f'Chapter {chapter_cnt}'})
-                        book_config['volumes'][volume['name']][chapter['name']] = dict(chapter_template)
+        book_uid = self._generate_book_uid()
+        book = ecmbBook(config.book_type, config.book_language, book_uid)
+
+        self._add_meta_data(book, volume_nr)
+        self._set_cover(book, resize_method, volume_dir)
+        self._add_content(book, resize_method, chapter_list)
+
+        if not os.path.exists(self._output_dir):
+            os.makedirs(self._output_dir)
+
+        book.write(self._output_dir + file_name, True, True)
+
+        print('', flush=True)
+
+
+    def _set_cover(self, book: ecmbBook, resize_method: ecmbBuilderResizeBase, volume_dir: str) -> None:
+        volume_dir = self._book_config._source_dir + volume_dir
+
+        image_list = ecmbBuilderUtils.list_files(volume_dir, None, r'^(f|front|cover_front).+[.](jpg|jpeg|png|webp)$', 0)
+        if len(image_list):
+            image_path = image_list[0]['path'] + image_list[0]['name']
+            image = resize_method.process(image_path)
+            book.content.set_cover_front(image[0])
+
+        image_list = ecmbBuilderUtils.list_files(volume_dir, None, r'^(r|rear|cover_rear).+[.](jpg|jpeg|png|webp)$', 0)
+        if len(image_list):
+            image_path = image_list[0]['path'] + image_list[0]['name']
+            image = resize_method.process(image_path)
+            book.content.set_cover_rear(image[0])
+            
+
+    
+    def _add_content(self, book: ecmbBook, resize_method: ecmbBuilderResizeBase, chapter_list: list) -> None:
+        for chapter in tqdm(chapter_list, desc='  add content'):
+            folder = book.content.add_folder(chapter['path'])
+            image_list = ecmbBuilderUtils.list_files(chapter['path'], None, r'^(?!__).+[.](jpg|jpeg|png|webp)$', 0)
+            for image in image_list:
+                image_path = chapter['path'] + image['name']
+                image = resize_method.process(image_path)
+                if len(image) == 3:
+                    folder.add_image(image[0], image[1], image[2], unique_id=image_path)
+                else:
+                    folder.add_image(image[0], unique_id=image_path)
+            
+            target = None
+            target_side = None
+            if chapter.get('start_with'):
+                start_with = chapter.get('start_with').split('#')
+                target = chapter['path'] + start_with[0]
+                target_side = start_with[1] if len(start_with) == 2 else None
+
+            book.navigation.add_chapter(chapter.get('label'), folder, target, target_side, chapter.get('title'))
+
+
+    def _add_meta_data(self, book: ecmbBook, volume_nr: int = None) -> None:
+        config = self._book_config
+        meta_data = config.meta_data
+        based_on = meta_data['based_on']
+
+        book.metadata.set_title(config.book_title)
+        book.metadata.set_volume(volume_nr)
+        book.metadata.set_isbn(meta_data.get('isbn'))
+        book.metadata.set_publishdate(meta_data.get('publishdate'))
+        book.metadata.set_description(meta_data.get('description'))
+
+        if type(meta_data.get('publisher')) == dict and meta_data['publisher'].get('name'):
+            book.metadata.set_publisher(meta_data['publisher'].get('name'), href = meta_data['publisher'].get('href'))
+
+        if type(meta_data.get('authors')) == list:
+            for author in meta_data.get('authors'):
+                if type(author) == dict and author.get('name'):
+                    book.metadata.add_author(author.get('name'), author.get('type'), href = author.get('href'))
+
+        if type(meta_data.get('genres')) == list:
+            for genre in meta_data.get('genres'):
+                book.metadata.add_genre(genre)
+
+        if type(meta_data.get('warnings')) == list:
+            for warning in meta_data.get('warnings'):
+                book.metadata.add_content_warning(warning)
+
+        book.based_on.set_type(based_on.get('type'))
+        book.based_on.set_isbn(based_on.get('isbn'))
+        book.based_on.set_publishdate(based_on.get('publishdate'))
+
+        if based_on.get('title'):
+           book.based_on.set_title(based_on.get('title'))
+
+        if type(based_on.get('publisher')) == dict and based_on['publisher'].get('name'):
+            book.based_on.set_publisher(based_on['publisher'].get('name'), href = based_on['publisher'].get('href'))
+
+        if type(based_on.get('authors')) == list:
+            for author in based_on.get('authors'):
+                if type(author) == dict and author.get('name'):
+                    book.based_on.add_author(author.get('name'), author.get('type'), href = author.get('href'))
+
+
+    def _generate_book_uid(self) -> str:
+        config = self._book_config
+
+        hash = config.book_title + str(datetime.now())
+
+        if type(config.meta_data.get('publisher')) == dict and config.meta_data['publisher'].get('name'):
+            prefix = str(config.meta_data['publisher'].get('name'))
         else: 
-            book_config['chapters'] = {}
-            for chapter in self._chapter_folders:
-                chapter_cnt += 1
-                chapter_template.update({'label': f'Chapter {chapter_cnt}'})
-                book_config['chapters'][chapter['name']] = dict(chapter_template)
+            prefix = config.book_title
 
-        with open(self._source_dir + 'book_config.json', 'w') as f:
-            json.dump( book_config, f, indent=4)
+        prefix = re.sub(r'[^a-z0-9]', '', prefix.lower())
+        return prefix + '_' + hashlib.md5(hash.encode()).hexdigest()
+    
+    
+    def _load_resize_method(self) -> ecmbBuilderResizeBase:
+        config = self._book_config
+
+        resize_methods = self._builder_config.resize_methods
+        resize_method = resize_methods[config.resize_method]
+
+        mod = __import__(resize_method[0], globals(), locals(), [resize_method[1]], 0)
+        clas = getattr(mod, resize_method[1])
+
+        return clas(config.resize_width, config.resize_height, config.webp_compression, config.compress_all)
+
+
+    def _init_book_config(self) -> None:
+        (chapter_folders, volume_folders) = self._read_folder_structure()
+        self._book_config.init_config(chapter_folders, volume_folders)
 
 
     def _rename_source_files(self) -> None:
-        if not self._rename:
+        if not self._builder_config.rename:
             return
         
-        self._rename_path(self._chapter_folders, 'chapter_', 4)
-        if self._has_volumes:
-            self._rename_path(self._volume_folders, 'volume_', 3)
+        (chapter_folders, volume_folders) = self._read_folder_structure()
 
-        self._read_folder_structure()
+        self._rename_path(chapter_folders, 'chapter_', 4)
+        if volume_folders:
+            self._rename_path(volume_folders, 'volume_', 3)
+
+        (chapter_folders, volume_folders) = self._read_folder_structure()
 
         image_nr = 0
-        for folder in self._chapter_folders:
-            file_list = ecmbBuilderUtils.list_files(folder['path'] + folder['name'], None, '^(__ecmbbuilder_tmpname_|(?!__)).+[.](jpg|jpeg|png|webp)$', 0)
+        for folder in chapter_folders:
+            file_list = ecmbBuilderUtils.list_files(folder['path'] + folder['name'], None, r'^(__ecmbbuilder_tmpname_|(?!__)).+[.](jpg|jpeg|png|webp)$', 0)
             image_nr = self._rename_path(file_list, 'img_', 6, '0', image_nr)
 
 
@@ -126,22 +219,29 @@ class ecmbBuilder():
                 new_name = tmp_name + (str(cnt).zfill(zfill))
                 new_name += '.' + item.get('extension') if item.get('extension') else ''
                 os.rename(item['path'] + item['name'], item['path'] + new_name)
-                item['name'] = new_name
+                item['tmp_name'] = new_name
 
             cnt = start_at
             for item in path_list:
                 cnt += 1
                 new_name = prefix + (str(cnt).zfill(zfill)) + suffix
                 new_name += '.' + item.get('extension') if item.get('extension') else ''
-                os.rename(item['path'] + item['name'], item['path'] + new_name)
+                os.rename(item['path'] + item['tmp_name'], item['path'] + new_name)
         except PermissionError:
+            try:
+                for item in path_list:
+                    if item.get('tmp_name'):
+                        os.rename(item['path'] + item['tmp_name'], item['path'] + item['name'])
+            except:
+                pass
+            
             raise ecmbException('Permission denied for rename folders/images. Please close opened files and folders!')
 
         return start_at + cnt
 
 
     def _read_folder_structure(self) -> None:
-        folder_list = ecmbBuilderUtils.list_dirs(self._source_dir, '^(__ecmbbuilder_tmpname_|(?!__)).+', 2)
+        folder_list = ecmbBuilderUtils.list_dirs(self._source_dir, r'^(__ecmbbuilder_tmpname_|(?!__)).+', 2)
         level0_folders = []
         level1_folders = []
         for folder in folder_list:
@@ -151,56 +251,19 @@ class ecmbBuilder():
                 level1_folders.append(folder)
 
         if len(level0_folders) > len(level1_folders):
-            self._has_volumes = False
-            self._volume_folders = None
-            self._chapter_folders = level0_folders
+            return (level0_folders, None)
         else:
-            self._has_volumes = True
-            self._volume_folders = level0_folders
-            self._chapter_folders = level1_folders
+            return (level1_folders, level0_folders)
 
 
-    def _read_book_config(self) -> None:
-        self._book_config = None
-        self._is_initialized = False
-        if os.path.exists(self._source_dir + 'book_config.json'):
-            try:
-                with open(self._source_dir + 'book_config.json', 'r') as f:		
-                    self._book_config = json.load(f)
-            except Exception as e:
-                raise ecmbException('Load "book_config.json" failed: ' + str(e))
-            self._is_initialized = True
-
-
-    def _set_source_dir(self, folder_name: str) -> None:
-        self._source_dir = None
-        source_dir = str(path.Path(self._working_dir + folder_name).abspath()) + '\\'
+    def _set_dirs(self, folder_name: str) -> None:
+        source_dir = str(path.Path(self._builder_config.source_dir + folder_name).abspath()) + '\\'
         if not os.path.isdir(source_dir):
             raise ecmbException(f'Comic/Manga folder "{folder_name}" was not found!')
+        
+        output_dir = str(path.Path(self._builder_config.output_dir + folder_name).abspath()) + '\\'
+        output_dir = str(path.Path(output_dir + '..\\').abspath()) + '\\'
+
         self._source_dir = source_dir
+        self._output_dir = output_dir
         
-
-    def _load_config(self) -> None:
-        builder_path = str(path.Path(__file__).abspath().parent.parent) + '\\'
-
-        try: 
-            with open(builder_path + 'ecmb_builder_config.yml', 'r') as file:
-                config = yaml.safe_load(file)
-        except:
-            raise ecmbException('Config not found or invalid!')
-        
-        # working-dir
-        working_dir = config.get('working_dir')
-        if not working_dir:
-            raise ecmbException('Config: working-dir is not defined!')
-
-        if not re.search(r'[:]', working_dir):
-            working_dir = builder_path + working_dir
-
-        self._working_dir = str(path.Path(working_dir).abspath()) +  '\\'
-        
-        if not os.path.isdir(self._working_dir ):
-            raise ecmbException('Config: working-dir was not found!')
-
-        # other config
-        self._rename = True if config.get('rename') else False

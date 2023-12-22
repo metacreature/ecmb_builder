@@ -12,13 +12,10 @@ class ecmbBuilder():
     
     _builder_config = None
     _book_config = None
+
+    _folder_name = None
     _source_dir = None
     _output_dir = None
-    
-
-    _has_volumes = None
-    _volume_folders = None
-    _chapter_folders = None
 
 
     def __init__(self, folder_name:str):
@@ -33,10 +30,12 @@ class ecmbBuilder():
         self._rename_source_files()
         self._init_book_config()
 
+        print('\033[1;32;40m  Open "' + self._source_dir + 'book_config.json" and add all the meta-data to your book!\x1b[0m\n')
+
 
     def build(self, volumes: int|list[int]) -> None:
         if not self._book_config.is_initialized:
-            raise ecmbException('Book is not initialized!')
+            raise ecmbException('Book is not initialized! Run "invoke init ' + self._folder_name + '" first!')
         
         resize_method = self._load_resize_method()
         
@@ -64,7 +63,7 @@ class ecmbBuilder():
         print('  ' + file_name, flush=True)
 
         book_uid = self._generate_book_uid()
-        book = ecmbBook(config.book_type, config.book_language, book_uid)
+        book = ecmbBook(config.book_type, config.book_language, book_uid, config.resize_width, config.resize_height)
 
         self._add_meta_data(book, volume_nr)
         self._set_cover(book, resize_method, volume_dir)
@@ -79,7 +78,7 @@ class ecmbBuilder():
 
 
     def _set_cover(self, book: ecmbBook, resize_method: ecmbBuilderResizeBase, volume_dir: str) -> None:
-        volume_dir = self._book_config._source_dir + volume_dir
+        volume_dir = self._source_dir + volume_dir
 
         image_list = ecmbBuilderUtils.list_files(volume_dir, None, r'^(f|front|cover_front).+[.](jpg|jpeg|png|webp)$', 0)
         if len(image_list):
@@ -216,7 +215,7 @@ class ecmbBuilder():
             cnt = start_at
             for item in path_list:
                 cnt += 1
-                new_name = tmp_name + (str(cnt).zfill(zfill))
+                new_name = item['name'] + tmp_name + (str(cnt).zfill(zfill))
                 new_name += '.' + item.get('extension') if item.get('extension') else ''
                 os.rename(item['path'] + item['name'], item['path'] + new_name)
                 item['tmp_name'] = new_name
@@ -264,6 +263,7 @@ class ecmbBuilder():
         output_dir = str(path.Path(self._builder_config.output_dir + folder_name).abspath()) + '\\'
         output_dir = str(path.Path(output_dir + '..\\').abspath()) + '\\'
 
+        self._folder_name = folder_name
         self._source_dir = source_dir
         self._output_dir = output_dir
         

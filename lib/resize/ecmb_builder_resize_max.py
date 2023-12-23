@@ -28,5 +28,7 @@ class ecmbBuilderResizeMax(ecmbBuilderResizeBase):
         
         pillow_resized = pillow_orig.resize((target_width, target_height))
         
-
+        pillow_orig.close()
+        del pillow_orig
+        
         return (pillow_resized, True)

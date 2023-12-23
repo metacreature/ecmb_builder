@@ -72,7 +72,7 @@ class ecmbBuilder():
         if not os.path.exists(self._output_dir):
             os.makedirs(self._output_dir)
 
-        book.write(self._output_dir + file_name, True, True)
+        book.write(self._output_dir + file_name)
 
         print('', flush=True)
 
@@ -80,13 +80,13 @@ class ecmbBuilder():
     def _set_cover(self, book: ecmbBook, resize_method: ecmbBuilderResizeBase, volume_dir: str) -> None:
         volume_dir = self._source_dir + volume_dir
 
-        image_list = ecmbBuilderUtils.list_files(volume_dir, None, r'^(f|front|cover_front).+[.](jpg|jpeg|png|webp)$', 0)
+        image_list = ecmbBuilderUtils.list_files(volume_dir, None, r'^(f|front|cover_front)[.](jpg|jpeg|png|webp)$', 0)
         if len(image_list):
             image_path = image_list[0]['path'] + image_list[0]['name']
             image = resize_method.process(image_path)
             book.content.set_cover_front(image[0])
 
-        image_list = ecmbBuilderUtils.list_files(volume_dir, None, r'^(r|rear|cover_rear).+[.](jpg|jpeg|png|webp)$', 0)
+        image_list = ecmbBuilderUtils.list_files(volume_dir, None, r'^(r|rear|cover_rear)[.](jpg|jpeg|png|webp)$', 0)
         if len(image_list):
             image_path = image_list[0]['path'] + image_list[0]['name']
             image = resize_method.process(image_path)
@@ -97,7 +97,7 @@ class ecmbBuilder():
     def _add_content(self, book: ecmbBook, resize_method: ecmbBuilderResizeBase, chapter_list: list) -> None:
         for chapter in tqdm(chapter_list, desc='  add content'):
             folder = book.content.add_folder(chapter['path'])
-            image_list = ecmbBuilderUtils.list_files(chapter['path'], None, r'^(?!__).+[.](jpg|jpeg|png|webp)$', 0)
+            image_list = ecmbBuilderUtils.list_files(chapter['path'], r'^(?!__).+$', r'^(?!__).+[.](jpg|jpeg|png|webp)$', 0)
             for image in image_list:
                 image_path = chapter['path'] + image['name']
                 image = resize_method.process(image_path)
@@ -146,9 +146,7 @@ class ecmbBuilder():
         book.based_on.set_type(based_on.get('type'))
         book.based_on.set_isbn(based_on.get('isbn'))
         book.based_on.set_publishdate(based_on.get('publishdate'))
-
-        if based_on.get('title'):
-           book.based_on.set_title(based_on.get('title'))
+        book.based_on.set_title(based_on.get('title'))
 
         if type(based_on.get('publisher')) == dict and based_on['publisher'].get('name'):
             book.based_on.set_publisher(based_on['publisher'].get('name'), href = based_on['publisher'].get('href'))
@@ -204,7 +202,7 @@ class ecmbBuilder():
 
         image_nr = 0
         for folder in chapter_folders:
-            file_list = ecmbBuilderUtils.list_files(folder['path'] + folder['name'], None, r'^(__ecmbbuilder_tmpname_|(?!__)).+[.](jpg|jpeg|png|webp)$', 0)
+            file_list = ecmbBuilderUtils.list_files(folder['path'] + folder['name'], r'^(?!__).+$', r'^(?!__).+[.](jpg|jpeg|png|webp)$', 0)
             image_nr = self._rename_path(file_list, 'img_', 6, '0', image_nr)
 
 
@@ -240,7 +238,7 @@ class ecmbBuilder():
 
 
     def _read_folder_structure(self) -> None:
-        folder_list = ecmbBuilderUtils.list_dirs(self._source_dir, r'^(__ecmbbuilder_tmpname_|(?!__)).+', 2)
+        folder_list = ecmbBuilderUtils.list_dirs(self._source_dir, r'^(?!__).+$', 2)
         level0_folders = []
         level1_folders = []
         for folder in folder_list:

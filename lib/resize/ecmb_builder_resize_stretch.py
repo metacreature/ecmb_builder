@@ -11,5 +11,8 @@ class ecmbBuilderResizeStretch(ecmbBuilderResizeBase):
             return (pillow_orig, False)
 
         pillow_resized = pillow_orig.resize((final_width, final_height))
+        
+        pillow_orig.close()
+        del pillow_orig
 
         return (pillow_resized, True)

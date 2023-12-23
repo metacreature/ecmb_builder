@@ -4,20 +4,32 @@ source_dir: ../source_dir/
 # absolute or relative path
 output_dir: ../output_dir/
 
+
 # automatic rename your when you initialize a book:
+# !!!! all your soure-images and source-folders will be renamed !!!!
 # - volume-folders (if there are 2 folder-levels) to volume_{number_zerofill}
 # - chapter-folders to chapter_{number_zerofill}
 # - images which are in your chapter-folders to img_{number_zerofill}0.{extension}
-# files are sorted alphanumeric
-# after rename each name will only exist once in the entire source-folder
-# files and folders starting with "__" (2 underscores) are ignored in general
-# images outside the chapter-folders ar also ignored for rename
-# if it got stuck, coz you have opened a file/folder and block access - dont-worry - start it twice
-rename: yes
+# Important:
+# - files are sorted alphanumeric
+# - files and folders starting with "__" (2 underscores) are ignored in general
+# - images outside the chapter-folders ar also ignored for rename
+# - after rename each name will only exist once in the entire source-folder
+# - if it got stuck, coz you have opened a file/folder and block access - dont-worry - start it twice
+rename: no
 
 
-# resize-method for images which don't have the book-size
-default_resize_method: cropmax
+# resize-method for images which don't have the resize-size and stores it as webp to the *.ecmb when you build it
+# !!!! your source-files stay untouched !!!!
+# available methods:
+# - none: does nothing to your files
+# - max: resizes the images with it's aspect-ratio to fit in the resize box
+# -      - good for minimize the file-size of your *.ecmb
+# - stretch: strechtes the image to the resize-size, the image will lose its original aspect-ratio
+# - cover: will resize the image to the box with its original aspect-ratio and cut off the overhanging parts
+# - cropmax: crops the white borders on the x-axis and then resizes the images with it's aspect-ratio to fit in the resize box.
+#            - good for downloaded images which often have wired borders. A single grey dot (from the scanning-process) can disturb doing this.
+default_resize_method: max
 
 # max 1800
 default_resize_width: 900
@@ -28,10 +40,14 @@ default_resize_height: 1200
 # highest compression is 0, 100 for lossless
 default_webp_compression: 75
 
-# compress all images with webp
+# compress all images with webp, even if they are not resized stores to the *.ecmb when you build it
+# !!!! your source-files stay untouched !!!!
+# good for minimize the file-size of your *.ecmb
 default_compress_all: yes
 
-# manga or comic
+# available types: 
+# - manga
+# - comic
 default_book_type: manga
 
 

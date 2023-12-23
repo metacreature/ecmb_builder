@@ -18,6 +18,9 @@ class ecmbBuilderResizeCropmax(ecmbBuilderResizeMax):
             return super()._resize(pillow_orig, final_width, final_height)
 
         pillow_resized = pillow_orig.crop((box[0], 0, box[2], orig_height))
+        
+        pillow_orig.close()
+        del pillow_orig
 
         if orig_width <= final_width and orig_height <= final_height:
             return (pillow_resized, True)

@@ -33,5 +33,7 @@ class ecmbBuilderResizeCover(ecmbBuilderResizeBase):
         else:
             pillow_resized = pillow_orig.resize((final_width, final_height))
         
-
+        pillow_orig.close()
+        del pillow_orig
+        
         return (pillow_resized, True)

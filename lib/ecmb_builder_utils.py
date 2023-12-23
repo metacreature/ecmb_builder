@@ -51,8 +51,8 @@ class ecmbBuilderUtils():
             if ele.name in [".", ".."]:
                 continue
             if ele.is_dir(follow_symlinks=False):
-                dir_list.append({'path': str(dirname), 'name': ele.name, 'level': level})
-                if not isinstance(dir_pattern, str) or (dir_pattern and re.search(dir_pattern, ele.name, re.IGNORECASE)):
+                if not isinstance(dir_pattern, str) or (dir_pattern and re.search(dir_pattern, ele.name, re.IGNORECASE)):  
+                    dir_list.append({'path': str(dirname), 'name': ele.name, 'level': level})
                     dir_list += ecmbBuilderUtils.list_dirs(
                         dirname + ele.name, dir_pattern, max_level, level + 1
                     )

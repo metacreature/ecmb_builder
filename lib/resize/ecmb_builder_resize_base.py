@@ -38,6 +38,8 @@ class ecmbBuilderResizeBase(ABC):
         width, height = pillow_full.size
         
         if (width / height) < (self._target_width / self._target_height * 1.5):
+            if type(fp_full) == str:
+                pillow_full.close()
             return [fp_full]
             
         pillow_left = pillow_full.crop((0, 0, round(width/2), height))
@@ -49,6 +51,9 @@ class ecmbBuilderResizeBase(ABC):
         fp_right = io.BytesIO()
         pillow_right.save(fp_right, 'webp', quality = self._webp_compression, method=5)
         del pillow_right
+        
+        if type(fp_full) == str:
+            pillow_full.close()
 
         return [fp_full, fp_left, fp_right]
     

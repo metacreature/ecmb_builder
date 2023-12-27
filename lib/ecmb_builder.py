@@ -97,7 +97,7 @@ class ecmbBuilder():
     def _add_content(self, book: ecmbBook, resize_method: ecmbBuilderResizeBase, chapter_list: list) -> None:
         for chapter in tqdm(chapter_list, desc='  add content'):
             folder = book.content.add_folder(chapter['path'])
-            image_list = ecmbBuilderUtils.list_files(chapter['path'], r'^(?!__).+$', r'^(?!__).+[.](jpg|jpeg|png|webp)$', 0)
+            image_list = self._get_image_list(chapter['path'])
             for image in image_list:
                 image_path = chapter['path'] + image['name']
                 image = resize_method.process(image_path)
@@ -185,6 +185,13 @@ class ecmbBuilder():
 
     def _init_book_config(self) -> None:
         (chapter_folders, volume_folders) = self._read_folder_structure()
+        if len(chapter_folders) == 0:
+            raise ecmbException('No chapter-folders available!')
+        
+        for chapter in chapter_folders:
+            if len(self._get_image_list(chapter['path'] + chapter['name'])) == 0:
+                raise ecmbException('Chapter-folder "' + chapter['path'] + chapter['name'] + '" is empty!')
+            
         self._book_config.init_config(chapter_folders, volume_folders)
 
 
@@ -202,7 +209,7 @@ class ecmbBuilder():
 
         image_nr = 0
         for folder in chapter_folders:
-            file_list = ecmbBuilderUtils.list_files(folder['path'] + folder['name'], r'^(?!__).+$', r'^(?!__).+[.](jpg|jpeg|png|webp)$', 0)
+            file_list = self._get_image_list(folder['path'] + folder['name'])
             image_nr = self._rename_path(file_list, 'img_', 6, '0', image_nr)
 
 
@@ -251,6 +258,10 @@ class ecmbBuilder():
             return (level0_folders, None)
         else:
             return (level1_folders, level0_folders)
+        
+    
+    def _get_image_list(self, path: str) -> list:
+        return ecmbBuilderUtils.list_files(path, None, r'^(?!__).+[.](jpg|jpeg|png|webp)$', 0)
 
 
     def _set_dirs(self, folder_name: str) -> None:

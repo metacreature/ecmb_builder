@@ -16,7 +16,10 @@ output_dir: ../output_dir/
 # - images outside the chapter-folders ar also ignored for rename
 # - after rename each name will only exist once in the entire source-folder
 # - if it got stuck, coz you have opened a file/folder and block access - dont-worry - start it twice
-rename: no
+# avaliable values
+# - true
+# - false
+rename: false
 
 
 # resize-method for images which don't have the resize-size and stores it as webp to the *.ecmb when you build it
@@ -43,7 +46,10 @@ default_webp_compression: 75
 # compress all images with webp, even if they are not resized stores to the *.ecmb when you build it
 # !!!! your source-files stay untouched !!!!
 # good for minimize the file-size of your *.ecmb
-default_compress_all: yes
+# avaliable values
+# - true
+# - false
+default_compress_all: true
 
 # available types: 
 # - manga

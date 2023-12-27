@@ -1,8 +1,6 @@
-import re, os, yaml, io, path, json, hashlib
-from datetime import datetime
-from .ecmb_builder_utils import ecmbBuilderUtils
+import re, os, json
 from .ecmb_builder_config import ecmbBuilderConfig
-from .ecmblib.ecmb import ecmbBook, ecmbUtils, ecmbException, BOOK_TYPE, BASED_ON_BOOK_TYPE, CONTENT_WARNING, AUTHOR_TYPE, ALLOWED_IMAGE_EXTENTIONS 
+from .ecmblib.ecmb import ecmbUtils, ecmbException, BOOK_TYPE, BASED_ON_BOOK_TYPE, CONTENT_WARNING, AUTHOR_TYPE
 
 
 class ecmbBuilderBookConfig():

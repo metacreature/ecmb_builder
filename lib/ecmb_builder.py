@@ -68,7 +68,8 @@ class ecmbBuilder():
             self._build_book(resize_method, '', self._book_config.chapter_list)
         else:
             if volumes != None:
-                volumes = volumes if type(volumes) == list else [volumes]
+                volumes = volumes if type(volumes) == list else volumes.split(',')
+                volumes = [e.strip() for e in volumes]
 
             volume_nr = 0
             for volume_dir, chapter_list in self._book_config.volume_list.items():

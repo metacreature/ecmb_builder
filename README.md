@@ -105,12 +105,20 @@ source_dir/
 - open the git-console with right-click (like you have done before)
 - type `invoke init "My_Manga_Name"`
 
+**Note!** If you delete the created "book_config.json" you have to run init again, or if your web-scapare allready created that file you can skip this step
+
 ### 3) Preparing for build
-- Now you can find a "book_config.json" - file in "source_dir/My_Manga_Name/". You should open it with a simple text-editor and add the meta-data like description, genres.
+- now you can find a "book_config.json" - file in "source_dir/My_Manga_Name/". You should open it with a simple text-editor and add the meta-data like description, genres.
 Optional information you can leave empty, default or simply delete them if you don't need it. If you leave them to default they won't appear in the book.
-- What the hell is "start_with": "my_image_name.jpg#left" at the chapters? If there is a prolog, spacer-images you don't want to delete or the chapter starts with a double-page-image its good to specify where the reader-app should jump, if you click on a chapter. When I was building ePub-files it was really confusing that the chapter started with a "random" image instead of the chapter's title-image.
-- If you have downloaded the images from the web it would be a good idea to delete translation-credits and adds from your source-folder, delete/add spacer-images and maybe even swap or edit images.
-- If you haven't got cover-images it would be good to add at least the front-cover.
+- what the hell is `"start_with": "my_image_name.jpg#left"` at the chapters? If there is a prolog, spacer-images you don't want to delete or the chapter starts with a double-page-image its good to specify where the reader-app should jump, if you click on a chapter. When I was building ePub-files it was really confusing that the chapter started with a "random" image instead of the chapter's title-image.
+- if you have downloaded the images from the web it would be a good idea to delete translation-credits and adds from your source-folder, delete/add spacer-images and maybe even swap or edit images.
+- if you haven't got cover-images it would be good to add at least the front-cover.
 
 ### 4) Build the book(s)
+- open the folder "ecmb_builder"
+- open the git-console with right-click (like you have done before)
+- type `invoke build "My_Manga_Name"` to build all volumes
+- type `invoke build "My_Manga_Name" --volumes 1,2,5` if you only want to build specific volumes
 
+
+Done ... your *.ecmb-files ar now in your output-dir!

@@ -9,7 +9,7 @@
 - validateable via XSD
 - published under [MIT License](https://choosealicense.com/licenses/mit/)
 
-# The project ([https://metacreature.github.io/ecmb](https://metacreature.github.io/ecmb))
+## The project ([https://metacreature.github.io/ecmb](https://metacreature.github.io/ecmb))
 **It contains:**
 - the [definition](https://github.com/metacreature/ecmb_definition) of the file-format and a file-validator
 - a [library](https://github.com/metacreature/ecmblib_python) for packing the eBooks
@@ -20,7 +20,7 @@
 **If you like it I would be happy if you  [donate on checkya](https://checkya.com/1hhp2cpit9eha/payme)**
 
 
-# About this repository:
+## About this repository:
 This is a easy-to-use builder to build *.ecmb-files from your source-images without knowing anything about programming.
 
 # Using the builder

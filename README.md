@@ -39,21 +39,21 @@ This is a easy-to-use builder to build *.ecmb-files from your source-images with
 - open the folder "ecmb_builder" and open the config-file `ecmb_builder_config.yml` with any simple text-editor
   (I would recommend to use [https://notepad-plus-plus.org/downloads/](https://notepad-plus-plus.org/downloads/)) and do your settings there (or just leave it as it is).
 
-### Building your first book
-Your source-files have to be stored in "comic_manga/source_dir" (if you didn't specify a different one in the config-file)
+### 1) Preparing your first book
+Your source-files have to be located in "comic_manga/source_dir" (if you didn't specify a different one in the config-file)
 
 File-Structure:
 ```
 source_dir/
     ˪ My_Manga_Name
-        ˪ chapter_001
-             ˪ img_00001.jpg
-             ˪ img_00002.jpg
-             ˪ img_00003.jpg
-             ˪ img_00004.jpg
-        ˪ chapter_002
-        ˪ chapter_003
-        ˪ chapter_004
+        ˪ chapter_0001
+             ˪ img_0000010.jpg
+             ˪ img_0000020.jpg
+             ˪ img_0000030.jpg
+             ˪ img_0000040.jpg
+        ˪ chapter_0002
+        ˪ chapter_0003
+        ˪ chapter_0004
         ˪ cover_front.jpg
         ˪ cover_rear.jpg
 ```
@@ -61,20 +61,26 @@ or
 ```
 source_dir/
     ˪ My_Manga_Name
-        ˪ volume_01
-            ˪ chapter_001
-               ˪ img_00001.jpg
-               ˪ img_00002.jpg
-               ˪ img_00003.jpg
-               ˪ img_00004.jpg
-            ˪ chapter_002
-            ˪ chapter_003
-            ˪ chapter_004
+        ˪ volume_001
+            ˪ chapter_0001
+               ˪ img_0000010.jpg
+               ˪ img_0000020.jpg
+               ˪ img_0000020.jpg
+               ˪ img_0000030.jpg
+            ˪ chapter_0002
+            ˪ chapter_0003
+            ˪ chapter_0004
             ˪ cover_front.jpg
             ˪ cover_rear.jpg
 ```
-The file-names can be messy - if you activated "rename" in the config-file, it will be renamed anyways. Files starting with "__" (2 underscores) are ignored in general.
-The cover-images have to have one of these names:
+- the file- and folder-names can be messy - if you activated "rename" in the config-file, it will be renamed anyways
+- the file- and folder-names ar sorted alphanumerc (like every file-system)
+- files and folders starting with "__" (2 underscores) are ignored in general
+- allowed image-extension: jpg, jpeg, png, webp
+- if you have cover-images they have to have one of these names:
+
+| Front-Cover:     | Rear-Cover:     |
+| ---------------- | --------------- |
 | cover_front.jpeg | cover_rear.jpeg |
 | cover_front.jpg  | cover_rear.jpg  |
 | cover_front.png  | cover_rear.png  |
@@ -87,4 +93,11 @@ The cover-images have to have one of these names:
 | f.jpg            | r.jpg           |
 | f.png            | r.png           |
 | f.webp           | r.webp          |
+
+**Note!** If you have many books in your source-folder you can organize them in subfolders
+
+### 2) Initialize the book
+- open the folder "ecmb_builder"
+- open the git-console with right-click (like you have done before)
+- type `invoke init "My_Manga_Name"`
 

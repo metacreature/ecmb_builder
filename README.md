@@ -72,6 +72,9 @@ source_dir/
             ˪ chapter_0004
             ˪ cover_front.jpg
             ˪ cover_rear.jpg
+        ˪ volume_002
+        ˪ volume_003
+        ˪ volume_004
 ```
 - the file- and folder-names can be messy - if you activated "rename" in the config-file, it will be renamed anyways
 - the file- and folder-names ar sorted alphanumerc (like every file-system)

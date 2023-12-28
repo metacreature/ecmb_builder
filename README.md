@@ -1,6 +1,7 @@
 # *.ecmb - The new Comic-Manga-eBook
 **Benefits:**
-- right to left reading in page-mode for mangas, while scroll-mode is still top-down
+- right to left reading in page-mode for Mangas, while scroll-mode is still top-down
+- of course left to right and top-down reading for (western) Comics
 - advanced support for double-pages
 - content-warnings for using safe-guard
 - a bunch of possible meta-data like genres and even the homepage of the publisher ([go to example >](https://github.com/metacreature/ecmb_definition/blob/master/examples/v1.0/example_full.xml))
@@ -12,7 +13,7 @@
 **It contains:**
 - the [definition](https://github.com/metacreature/ecmb_definition) of the file-format and a file-validator
 - a [library](https://github.com/metacreature/ecmblib_python) for packing the eBooks
-- a [builder](https://github.com/metacreature/ecmb_builder) for building the eBooks from your source-images
+- a simple-to-use [builder](https://github.com/metacreature/ecmb_builder) for building the eBooks from your source-images
 - a mobile-app for reading the eBooks is under developement
 - unfortunately there is no web-scraper to download source-images, coz I guess that would be illegal in my country to publish something like that. Maybe you'll find some here: [https://github.com/topics/manga-scraper](https://github.com/topics/manga-scraper)
 
@@ -39,7 +40,7 @@ This is a easy-to-use builder to build *.ecmb-files from your source-images with
 - open the folder "ecmb_builder" and open the config-file `ecmb_builder_config.yml` with any simple text-editor
   (I would recommend to use [https://notepad-plus-plus.org/downloads/](https://notepad-plus-plus.org/downloads/)) and do your settings there (or just leave it as it is).
 
-### 1) Preparing your first book
+### 1) The source-files
 Your source-files have to be located in "comic_manga/source_dir" (if you didn't specify a different one in the config-file)
 
 File-Structure:
@@ -103,4 +104,13 @@ source_dir/
 - open the folder "ecmb_builder"
 - open the git-console with right-click (like you have done before)
 - type `invoke init "My_Manga_Name"`
+
+### 3) Preparing for build
+- Now you can find a "book_config.json" - file in "source_dir/My_Manga_Name/". You should open it with a simple text-editor and add the meta-data like description, genres.
+Optional information you can leave empty, default or simply delete them if you don't need it. If you leave them to default they won't appear in the book.
+- What the hell is "start_with": "my_image_name.jpg#left" at the chapters? If there is a prolog, spacer-images you don't want to delete or the chapter starts with a double-page-image its good to specify where the reader-app should jump, if you click on a chapter. When I was building ePub-files it was really confusing that the chapter started with a "random" image instead of the chapter's title-image.
+- If you have downloaded the images from the web it would be a good idea to delete translation-credits and adds from your source-folder, delete/add spacer-images and maybe even swap or edit images.
+- If you haven't got cover-images it would be good to add at least the front-cover.
+
+### 4) Build the book(s)
 

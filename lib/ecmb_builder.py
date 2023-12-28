@@ -60,7 +60,7 @@ class ecmbBuilder():
 
     def build(self, volumes: int|list[int]) -> None:
         if not self._book_config.is_initialized:
-            raise ecmbException('Book is not initialized! Run "invoke init ' + self._folder_name + '" first!')
+            raise ecmbException('Book is not initialized! Run `invoke init "' + self._folder_name + '"` first!')
         
         resize_method = self._load_resize_method()
         
@@ -73,7 +73,7 @@ class ecmbBuilder():
             volume_nr = 0
             for volume_dir, chapter_list in self._book_config.volume_list.items():
                 volume_nr += 1
-                if volumes and volume_nr not in volumes:
+                if volumes and str(volume_nr) not in volumes:
                     continue
                 self._build_book(resize_method, volume_dir, chapter_list, volume_nr)
 

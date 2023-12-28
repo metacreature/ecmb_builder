@@ -1,6 +1,7 @@
 __pycache__/
 lib/ecmblib/
 .settings/
+.vscode/
 .project
 .buildpath
 .pydevproject

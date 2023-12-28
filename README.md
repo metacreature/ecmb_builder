@@ -9,7 +9,7 @@
 - validateable via XSD
 - published under [MIT License](https://choosealicense.com/licenses/mit/)
 
-## The project ([https://metacreature.github.io/ecmb](https://metacreature.github.io/ecmb))
+# The project ([https://metacreature.github.io/ecmb](https://metacreature.github.io/ecmb))
 **It contains:**
 - the [definition](https://github.com/metacreature/ecmb_definition) of the file-format and a file-validator
 - a [library](https://github.com/metacreature/ecmblib_python) for packing the eBooks
@@ -20,7 +20,7 @@
 **If you like it I would be happy if you  [donate on checkya](https://checkya.com/1hhp2cpit9eha/payme)**
 
 
-## About this repository:
+# About this repository:
 This is a easy-to-use builder to build *.ecmb-files from your source-images without knowing anything about programming.
 
 # Using the builder
@@ -105,7 +105,7 @@ source_dir/
 - open the git-console with right-click (like you have done before)
 - type `invoke init "My_Manga_Name"`
 
-**Note!** If you delete the created "book_config.json" you have to run init again, or if your web-scapare allready created that file you can skip this step
+**Note!** If you delete the created "book_config.json" you have to run init again, or if your web-scraper allready created that file you can skip this step
 
 ### 3) Preparing for build
 - now you can find a "book_config.json" - file in "source_dir/My_Manga_Name/". You should open it with a simple text-editor and add the meta-data like description, genres.
@@ -121,4 +121,4 @@ Optional information you can leave empty, default or simply delete them if you d
 - type `invoke build "My_Manga_Name" --volumes 1,2,5` if you only want to build specific volumes
 
 
-Done ... your *.ecmb-files ar now in your output-dir!
+__Done ... your *.ecmb-files ar now in your output-dir!__

@@ -21,7 +21,7 @@
 
 
 ## About this repository:
-This is a simple-to-use builder to build *.ecmb-files from your source-images without knowing anything about programming.
+This is a simple-to-use builder to build *.ecmb-files from your source-images without knowing anything about programming. Its only capable of creating simple books with no sub-folders or advanced navigation.
 
 # Using the builder
 

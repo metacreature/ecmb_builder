@@ -23,6 +23,8 @@
 ## About this repository:
 This is a simple-to-use builder to build *.ecmb-files from your source-images without knowing anything about programming. Its only capable of creating simple books with no sub-folders or advanced navigation.
 
+Published under [MIT License](https://choosealicense.com/licenses/mit/)
+
 # Using the builder
 
 ### Installation

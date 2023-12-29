@@ -21,7 +21,7 @@
 
 
 ## About this repository:
-This is a easy-to-use builder to build *.ecmb-files from your source-images without knowing anything about programming.
+This is a simple-to-use builder to build *.ecmb-files from your source-images without knowing anything about programming.
 
 # Using the builder
 
@@ -56,7 +56,7 @@ source_dir/
         ˪ chapter_0003
         ˪ chapter_0004
         ˪ cover_front.jpg
-        ˪ cover_rear.jpg
+        ˪ cover_re.jpg
 ```
 or 
 ```
@@ -66,8 +66,8 @@ source_dir/
             ˪ chapter_0001
                ˪ img_0000010.jpg
                ˪ img_0000020.jpg
-               ˪ img_0000020.jpg
                ˪ img_0000030.jpg
+               ˪ img_0000040.jpg
             ˪ chapter_0002
             ˪ chapter_0003
             ˪ chapter_0004
@@ -78,7 +78,7 @@ source_dir/
         ˪ volume_004
 ```
 - the file- and folder-names can be messy - if you activated "rename" in the config-file, it will be renamed anyways
-- the file- and folder-names ar sorted alphanumerc (like every file-system)
+- the file- and folder-names are sorted alphanumerc (like every file-system)
 - files and folders starting with "__" (2 underscores) are ignored in general
 - allowed image-extension: jpg, jpeg, png, webp
 - if you have cover-images they have to have one of these names:

@@ -1,3 +1,7 @@
+> [!WARNING]
+> This project is still under developement, so please don't use it atm
+
+
 # *.ecmb - The new Comic-Manga-eBook
 **Benefits:**
 - right to left reading in page-mode for Mangas, while scroll-mode is still top-down

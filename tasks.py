@@ -24,16 +24,29 @@
 """
 
 from invoke import task
+from lib.ecmb_builder_enums import *
+from lib.ecmb_renamer import ecmbRenamer
 from lib.ecmb_builder import ecmbBuilder
-from lib.ecmblib.ecmb import ecmbException
+from lib.ecmblib.src.ecmblib import ecmbException
+
+@task()
+def rename(ctx, folder_name: str):
+	print(' ', flush=True)
+	try:
+		renamer = ecmbRenamer(folder_name)
+		renamer.rename()
+		print('\033[1;32;40m  SUCCESS!\x1b[0m\n', flush=True)
+	except ecmbException as e:
+		msg = '\n'.join(['  ' + p for p in str(e).split('\n')])
+		print('\x1b[31;20m\n' + msg + '\n\n  FAILED!  \x1b[0m\n', flush=True)
 
 
 @task()
-def init(ctx, folder_name):
+def init(ctx, init_type: INIT_TYPE, folder_name: str):
 	print(' ', flush=True)
 	try:
 		builder = ecmbBuilder(folder_name)
-		builder.initialize()
+		builder.initialize(init_type)
 		print('\033[1;32;40m  SUCCESS!\x1b[0m\n', flush=True)
 	except ecmbException as e:
 		msg = '\n'.join(['  ' + p for p in str(e).split('\n')])
@@ -42,7 +55,7 @@ def init(ctx, folder_name):
 
 
 @task(optional=["volumes"])
-def build(ctx, folder_name, volumes = None):
+def build(ctx, folder_name: str, volumes: str = None):
 	print(' ', flush=True)
 	try:
 		builder = ecmbBuilder(folder_name)

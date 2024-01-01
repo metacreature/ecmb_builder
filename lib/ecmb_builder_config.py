@@ -25,7 +25,7 @@
 
 import re, os, yaml, path
 from .ecmb_builder_utils import ecmbBuilderUtils
-from .ecmblib.ecmb import ecmbUtils, ecmbException, BOOK_TYPE
+from .ecmblib.src.ecmblib import ecmbUtils, ecmbException, BOOK_TYPE
 
 
 
@@ -35,7 +35,6 @@ class ecmbBuilderConfig():
 
     _source_dir = None
     _output_dir = None
-    _rename = None
 
     _default_resize_method = None
     _default_webp_compression = None
@@ -61,10 +60,6 @@ class ecmbBuilderConfig():
     def get_output_dir(self):
         return self._output_dir
     output_dir: str = property(get_output_dir) 
-
-    def get_rename(self):
-        return self._rename
-    rename: bool = property(get_rename) 
 
     def get_default_resize_method(self):
         return self._default_resize_method
@@ -141,9 +136,7 @@ class ecmbBuilderConfig():
             raise ecmbException('Your Builder-Config "ecmb_builder_config.yml" contains an invalid value or the value is missing:\n' + str(e))
         
         
-        self._rename = True if config.get('rename') else False
         self._default_compress_all = True if config.get('default_compress_all') else False
-
         self._default_resize_method = config.get('default_resize_method') 
         self._default_webp_compression = config.get('default_webp_compression')
         self._default_book_type = config.get('default_book_type')

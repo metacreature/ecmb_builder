@@ -24,8 +24,9 @@
 """
 
 import re, os, json
+from .ecmb_builder_enums import *
 from .ecmb_builder_config import ecmbBuilderConfig
-from .ecmblib.ecmb import ecmbUtils, ecmbException, BOOK_TYPE, BASED_ON_BOOK_TYPE, CONTENT_WARNING, AUTHOR_TYPE
+from .ecmblib.src.ecmblib import ecmbUtils, ecmbException, BOOK_TYPE, BASED_ON_BOOK_TYPE, CONTENT_WARNING, AUTHOR_TYPE, EDITOR_TYPE
 
 
 class ecmbBuilderBookConfig():
@@ -193,6 +194,19 @@ class ecmbBuilderBookConfig():
         else: 
             config['optional'] = {}
 
+        if type(config['optional'].get('genres')) == list:
+            for genre_nr in range(len(config['optional']['genres'])):
+                if re.search(r'^Example.*', config['optional']['genres'][genre_nr]):
+                    config['optional']['genres'][genre_nr] = None
+        else:
+            config['optional']['genres'] = {}
+
+        if type(config['optional'].get('original')) == dict:
+            if config['optional']['original'].get('publishdate') == '0000-00-00|0000':
+                config['optional']['original']['publishdate'] = ''
+        else:
+            config['optional']['original'] = {}
+
         if type(config['optional'].get('based_on')) == dict:
             based_on_book_type = ecmbUtils.enum_values(BASED_ON_BOOK_TYPE)
             if config['optional']['based_on'].get('type') == '|'.join(based_on_book_type):
@@ -208,14 +222,18 @@ class ecmbBuilderBookConfig():
         self._is_initialized = True
     
 
-    def init_config(self, chapter_folders: list, volume_folders: list = None) -> None:
+    def init_config(self, init_type: INIT_TYPE, chapter_folders: list, volume_folders: list = None) -> None:
         if self._is_initialized:
             ecmbUtils.raise_exception('Book is allready initialized!')
+        
+        ecmbUtils.validate_enum(True, 'init_type', init_type, INIT_TYPE)
 
         warnings = ecmbUtils.enum_values(CONTENT_WARNING)
         based_on_book_type = ecmbUtils.enum_values(BASED_ON_BOOK_TYPE)
         authors = ecmbUtils.enum_values(AUTHOR_TYPE)
         authors = [{'name': '', 'type': at, 'href': ''} for at in authors]
+        editors = ecmbUtils.enum_values(EDITOR_TYPE)
+        editors = [{'name': '', 'type': at, 'href': ''} for at in editors]
 
         book_config = {
             'builder-config': {
@@ -230,30 +248,82 @@ class ecmbBuilderBookConfig():
                 'language': self._builder_config._default_book_language,
                 'title':  re.sub(r'[^a-zA-Z0-9]+', ' ', self._source_dir.split('\\')[-2]).strip(),
             },
-            'optional': {
-                'isbn': '',
-                'publisher': {
-                    'name': '',
-                    'href': ''
-                },
-                'publishdate': '0000-00-00|0000',
-                'description': '',
-                'authors': authors,
-                'genres': [],
-                'warnings': warnings,
-                'based_on': {
-                    'type': '|'.join(based_on_book_type),
+        }
+
+        match ecmbUtils.enum_value(init_type):
+            case INIT_TYPE.FULL.value:
+                book_config['optional'] = {
                     'isbn': '',
                     'publisher': {
                         'name': '',
                         'href': ''
                     },
                     'publishdate': '0000-00-00|0000',
-                    'title': '',
-                    'authors': authors
+                    'description': '',
+                    'notes': '',
+                    'genres': ['Example1', 'Example2'],
+                    'warnings': warnings,
+                    'authors': authors,
+                    'editors': editors,
+                    'original': {
+                        'language': '',
+                        'isbn': '',
+                        'publisher': {
+                            'name': '',
+                            'href': ''
+                        },
+                        'publishdate': '0000-00-00|0000',
+                        'title': '',
+                        'authors': authors
+                    },
+                    'based_on': {
+                        'type': '|'.join(based_on_book_type),
+                        'language': '',
+                        'isbn': '',
+                        'publisher': {
+                            'name': '',
+                            'href': ''
+                        },
+                        'publishdate': '0000-00-00|0000',
+                        'title': '',
+                        'authors': authors
+                    }
                 }
-            }
-        }
+            case INIT_TYPE.TRANSLATED.value:
+                book_config['optional'] = {
+                    'isbn': '',
+                    'publisher': {
+                        'name': '',
+                        'href': ''
+                    },
+                    'publishdate': '0000-00-00|0000',
+                    'description': '',
+                    'notes': '',
+                    'genres': ['Example1', 'Example2'],
+                    'warnings': warnings,
+                    'editors': editors,
+                    'original': {
+                        'language': '',
+                        'isbn': '',
+                        'publisher': {
+                            'name': '',
+                            'href': ''
+                        },
+                        'publishdate': '0000-00-00|0000',
+                        'title': '',
+                        'authors': authors
+                    }
+                }
+            case INIT_TYPE.BASIC.value:
+                book_config['optional'] = {
+                    'description': '',
+                    'notes': '',
+                    'genres': ['Example1', 'Example2'],
+                    'warnings': warnings,
+                    'authors': authors,
+                    'editors': editors,
+                }
+        
 
         chapter_cnt = 0
         chapter_template = {

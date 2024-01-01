@@ -5,23 +5,6 @@ source_dir: ../source_dir/
 output_dir: ../output_dir/
 
 
-# automatic rename your when you initialize a book:
-# !!!! all your soure-images and source-folders will be renamed !!!!
-# - volume-folders (if there are 2 folder-levels) to volume_{number_zerofill}
-# - chapter-folders to chapter_{number_zerofill}
-# - images which are in your chapter-folders to img_{number_zerofill}0.{extension}
-# Important:
-# - files are sorted alphanumeric
-# - files and folders starting with "__" (2 underscores) are ignored in general
-# - images outside the chapter-folders ar also ignored for rename
-# - after rename each name will only exist once in the entire source-folder
-# - if it got stuck, coz you have opened a file/folder and block access - dont-worry - start it twice
-# avaliable values
-# - true
-# - false
-rename: false
-
-
 # resize-method for images which don't have the resize-size and stores it as webp to the *.ecmb when you build it
 # !!!! your source-files stay untouched !!!!
 # available methods:

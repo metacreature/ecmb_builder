@@ -226,6 +226,7 @@ class ecmbBuilderBookConfig():
         if self._is_initialized:
             ecmbUtils.raise_exception('Book is allready initialized!')
         
+        init_type = ecmbUtils.enum_value(init_type)
         ecmbUtils.validate_enum(True, 'init_type', init_type, INIT_TYPE)
 
         warnings = ecmbUtils.enum_values(CONTENT_WARNING)
@@ -250,7 +251,7 @@ class ecmbBuilderBookConfig():
             },
         }
 
-        match ecmbUtils.enum_value(init_type):
+        match init_type:
             case INIT_TYPE.FULL.value:
                 book_config['optional'] = {
                     'isbn': '',
@@ -336,17 +337,17 @@ class ecmbBuilderBookConfig():
             book_config['volumes'] = {}
             for volume in volume_folders:
                 book_config['volumes'][volume['name']] = {}
-                volume_path = volume['path'] + volume['name'] + '\\'
-                for chapter in chapter_folders:
-                    if chapter['path'] == volume_path:
-                        chapter_cnt += 1
-                        chapter_template.update({'label': f'Chapter {chapter_cnt}'})
-                        book_config['volumes'][volume['name']][chapter['name']] = dict(chapter_template)
+                for chapter in volume['chapters']:
+                    label = re.sub(r'^(chapter_)?[0-9_ -]+', '', chapter['name'])
+                    chapter_cnt += 1
+                    chapter_template.update({'label': label if label else f'Chapter {chapter_cnt}'})
+                    book_config['volumes'][volume['name']][chapter['name']] = dict(chapter_template)
         else: 
             book_config['chapters'] = {}
             for chapter in chapter_folders:
+                label = re.sub(r'^(chapter_)?[0-9_ -]+', '', chapter['name'])
                 chapter_cnt += 1
-                chapter_template.update({'label': f'Chapter {chapter_cnt}'})
+                chapter_template.update({'label': label if label else f'Chapter {chapter_cnt}'})
                 book_config['chapters'][chapter['name']] = dict(chapter_template)
 
         with open(self._source_dir + 'book_config.json', 'w') as f:

@@ -25,6 +25,18 @@
 
 from enum import Enum
 
+class RENAME_ITEMS(Enum):
+    VOLUMES = 'volumes'
+    CHAPTERS = 'chapters'
+    IMAGES = 'images'
+    ALL = 'all'
+
+class RENAME_TYPE(Enum):
+    PREFIX = 'prefix'
+    RENAME = 'rename'
+    REVERSE = 'reverse'
+    ZEROPAD = 'zeropad'
+
 
 class INIT_TYPE(Enum):
     BASIC = 'basic'

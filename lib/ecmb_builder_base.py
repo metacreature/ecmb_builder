@@ -59,9 +59,21 @@ class ecmbBuilderBase():
             else:
                 level1_folders.append(folder)
 
-        if len(level0_folders) > len(level1_folders):
+        if len(level0_folders) > len(level1_folders):  
+            if len(level0_folders) == 0:
+                raise ecmbException('No chapter-folders available!')
             return (level0_folders, None)
         else:
+            for volume in level0_folders:
+                volume_path = volume['path'] + volume['name'] + '\\'
+                volume['chapters'] = []
+                for chapter in level1_folders:
+                    if chapter['path'] == volume_path:
+                        volume['chapters'].append(chapter)
+
+                if len(volume['chapters']) == 0:
+                    raise ecmbException('"'+ volume['name'] + '" has no chapters!')
+
             return (level1_folders, level0_folders)
         
     

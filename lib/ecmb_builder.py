@@ -39,10 +39,7 @@ class ecmbBuilder(ecmbBuilderBase):
         if self._book_config.is_initialized:
             raise ecmbException('Book is allready initialized!')
         
-        (chapter_folders, volume_folders) = self._read_folder_structure()
-        if len(chapter_folders) == 0:
-            raise ecmbException('No chapter-folders available!')
-        
+        (chapter_folders, volume_folders) = self._read_folder_structure()        
         for chapter in chapter_folders:
             if len(self._get_image_list(chapter['path'] + chapter['name'])) == 0:
                 raise ecmbException('Chapter-folder "' + chapter['path'] + chapter['name'] + '" is empty!')

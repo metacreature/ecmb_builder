@@ -1,5 +1,5 @@
 """
- File: ecmb_enums.py
+ File: ecmb_builder_enums.py
  Copyright (c) 2023 Clemens K. (https://github.com/metacreature)
  
  MIT License

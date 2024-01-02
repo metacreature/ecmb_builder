@@ -1,5 +1,5 @@
 """
- File: ecmb_builder.py
+ File: ecmb_builder_base.py
  Copyright (c) 2023 Clemens K. (https://github.com/metacreature)
  
  MIT License

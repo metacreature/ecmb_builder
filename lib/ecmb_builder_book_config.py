@@ -26,7 +26,7 @@
 import re, os, json
 from .ecmb_builder_enums import *
 from .ecmb_builder_config import ecmbBuilderConfig
-from .ecmblib.src.ecmblib import ecmbUtils, ecmbException, BOOK_TYPE, BASED_ON_BOOK_TYPE, CONTENT_WARNING, AUTHOR_TYPE, EDITOR_TYPE
+from .ecmblib.src.ecmblib import ecmbUtils, ecmbException, BOOK_TYPE, BASED_ON_TYPE, CONTENT_WARNING, AUTHOR_ROLE, EDITOR_ROLE
 
 
 class ecmbBuilderBookConfig():
@@ -208,8 +208,8 @@ class ecmbBuilderBookConfig():
             config['optional']['original'] = {}
 
         if type(config['optional'].get('based_on')) == dict:
-            based_on_book_type = ecmbUtils.enum_values(BASED_ON_BOOK_TYPE)
-            if config['optional']['based_on'].get('type') == '|'.join(based_on_book_type):
+            based_on_type = ecmbUtils.enum_values(BASED_ON_TYPE)
+            if config['optional']['based_on'].get('type') == '|'.join(based_on_type):
                 config['optional']['based_on']['type'] = ''
 
             if config['optional']['based_on'].get('publishdate') == '0000-00-00|0000':
@@ -230,11 +230,11 @@ class ecmbBuilderBookConfig():
         ecmbUtils.validate_enum(True, 'init_type', init_type, INIT_TYPE)
 
         warnings = ecmbUtils.enum_values(CONTENT_WARNING)
-        based_on_book_type = ecmbUtils.enum_values(BASED_ON_BOOK_TYPE)
-        authors = ecmbUtils.enum_values(AUTHOR_TYPE)
-        authors = [{'name': '', 'type': at, 'href': ''} for at in authors]
-        editors = ecmbUtils.enum_values(EDITOR_TYPE)
-        editors = [{'name': '', 'type': at, 'href': ''} for at in editors]
+        based_on_type = ecmbUtils.enum_values(BASED_ON_TYPE)
+        authors = ecmbUtils.enum_values(AUTHOR_ROLE)
+        authors = [{'name': '', 'role': at, 'href': ''} for at in authors]
+        editors = ecmbUtils.enum_values(EDITOR_ROLE)
+        editors = [{'name': '', 'role': at, 'href': ''} for at in editors]
 
         book_config = {
             'builder-config': {
@@ -260,7 +260,7 @@ class ecmbBuilderBookConfig():
                         'href': ''
                     },
                     'publishdate': '0000-00-00|0000',
-                    'description': '',
+                    'summary': '',
                     'notes': '',
                     'genres': ['Example1', 'Example2'],
                     'warnings': warnings,
@@ -278,7 +278,7 @@ class ecmbBuilderBookConfig():
                         'authors': authors
                     },
                     'based_on': {
-                        'type': '|'.join(based_on_book_type),
+                        'type': '|'.join(based_on_type),
                         'language': '',
                         'isbn': '',
                         'publisher': {
@@ -298,7 +298,7 @@ class ecmbBuilderBookConfig():
                         'href': ''
                     },
                     'publishdate': '0000-00-00|0000',
-                    'description': '',
+                    'summary': '',
                     'notes': '',
                     'genres': ['Example1', 'Example2'],
                     'warnings': warnings,
@@ -317,7 +317,7 @@ class ecmbBuilderBookConfig():
                 }
             case INIT_TYPE.BASIC.value:
                 book_config['optional'] = {
-                    'description': '',
+                    'summary': '',
                     'notes': '',
                     'genres': ['Example1', 'Example2'],
                     'warnings': warnings,

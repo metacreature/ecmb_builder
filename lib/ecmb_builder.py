@@ -148,7 +148,7 @@ class ecmbBuilder(ecmbBuilderBase):
         book.metadata.set_publishdate(meta_data.get('publishdate'))
         if type(meta_data.get('publisher')) == dict and meta_data['publisher'].get('name'):
             book.metadata.set_publisher(meta_data['publisher'].get('name'), href = meta_data['publisher'].get('href'))
-        book.metadata.set_description(meta_data.get('description'))
+        book.metadata.set_summary(meta_data.get('summary'))
         book.metadata.set_notes(meta_data.get('notes'))
 
         if type(meta_data.get('genres')) == list:
@@ -163,12 +163,12 @@ class ecmbBuilder(ecmbBuilderBase):
         if type(meta_data.get('authors')) == list:
             for author in meta_data.get('authors'):
                 if type(author) == dict and author.get('name'):
-                    book.metadata.add_author(author.get('name'), author.get('type'), href = author.get('href'))
+                    book.metadata.add_author(author.get('name'), author.get('role'), href = author.get('href'))
 
         if type(meta_data.get('editors')) == list:
             for editor in meta_data.get('editors'):
                 if type(editor) == dict and editor.get('name'):
-                    book.metadata.add_editor(editor.get('name'), editor.get('type'), href = editor.get('href'))
+                    book.metadata.add_editor(editor.get('name'), editor.get('role'), href = editor.get('href'))
 
         # original
         book.original.set_language(original.get('language'))
@@ -181,7 +181,7 @@ class ecmbBuilder(ecmbBuilderBase):
         if type(original.get('authors')) == list:
             for author in original.get('authors'):
                 if type(author) == dict and author.get('name'):
-                    book.original.add_author(author.get('name'), author.get('type'), href = author.get('href'))
+                    book.original.add_author(author.get('name'), author.get('role'), href = author.get('href'))
 
         # based_on
         book.based_on.set_type(based_on.get('type'))
@@ -195,7 +195,7 @@ class ecmbBuilder(ecmbBuilderBase):
         if type(based_on.get('authors')) == list:
             for author in based_on.get('authors'):
                 if type(author) == dict and author.get('name'):
-                    book.based_on.add_author(author.get('name'), author.get('type'), href = author.get('href'))
+                    book.based_on.add_author(author.get('name'), author.get('role'), href = author.get('href'))
 
 
     def _generate_book_uid(self) -> str:

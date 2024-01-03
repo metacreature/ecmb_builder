@@ -1,4 +1,4 @@
 > [!WARNING]
-> Moved to [https://comic-manga-ebook.github.com/ecmb_builder](https://comic-manga-ebook.github.com/ecmb_builder)
+> Moved to [https://github.com/comic-manga-ebook/ecmb_builder](https://github.com/comic-manga-ebook/ecmb_builder)
 > This project is not maintained anymore!
 
